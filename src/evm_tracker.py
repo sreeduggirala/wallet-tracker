@@ -33,10 +33,14 @@ def get_net_worth(address: str) -> dict:
     return result.total_networth_usd
 
 
-def get_win_rate(address: str, chain: str) -> dict:
-    # pnl_breakdown = get_pnl_breakdown(address, chain)
-    # logic to calculate win rate
-    pass
+def get_win_rate(address: str, chain: str) -> float:
+    pnl_breakdown = get_pnl_breakdown(address, chain)
+    wins = 0
+    for trade in pnl_breakdown.result:
+        if trade["realized_profit_percentage"] > 0:
+            wins += 1
+
+    return wins / len(pnl_breakdown.result)
 
 
 def get_native_balance(address: str, chain: str) -> dict:
