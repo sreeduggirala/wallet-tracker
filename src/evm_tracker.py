@@ -3,7 +3,6 @@ from moralis import evm_api
 import os
 
 load_dotenv()
-# api_key = os.getenv("MORALIS_API_KEY")
 
 
 def get_pnl_breakdown(address: str, chain: str) -> dict:
@@ -18,7 +17,7 @@ def get_pnl_breakdown(address: str, chain: str) -> dict:
     )
 
 
-def get_net_worth(address: str) -> dict:
+def get_net_worth(address: str) -> float:
     params = {
         "exclude_spam": True,
         "exclude_unverified_contracts": False,
@@ -30,17 +29,20 @@ def get_net_worth(address: str) -> dict:
         params=params,
     )
 
-    return result.total_networth_usd
+    return float(result.total_networth_usd)
 
 
 def get_win_rate(address: str, chain: str) -> float:
     pnl_breakdown = get_pnl_breakdown(address, chain)
+    # print(pnl_breakdown["result"][0])
     wins = 0
-    for trade in pnl_breakdown.result:
-        if trade["realized_profit_percentage"] > 0:
+    i = 0
+    while i < len(pnl_breakdown["result"]):
+        if pnl_breakdown["result"][i]["realized_profit_percentage"] > 0:
             wins += 1
+        i += 1
 
-    return wins / len(pnl_breakdown.result)
+    return wins / len(pnl_breakdown["result"])
 
 
 def get_native_balance(address: str, chain: str) -> dict:
@@ -81,7 +83,7 @@ def get_erc20_transfers(address: str, chain: str) -> dict:
     )
 
 
-def get_ens_by_address(address: str) -> dict:
+def get_ens_by_address(address: str) -> str:
     params = {"address": address}
 
     result = evm_api.resolve.resolve_address(
